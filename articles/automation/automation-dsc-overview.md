@@ -37,14 +37,39 @@ Prefer watching to reading? Have a look at the below video from May 2015, when A
 PowerShell DSC introduced a new concept called configurations. Configurations allow you to define, via PowerShell syntax, the desired state of your environment. To use DSC to configure your environment, first define a Windows PowerShell script block using the configuration keyword, then follow it with an identifier, then with braces ({}) to delimit the block.
 
 ![alt text](./media/automation-dsc-overview/AADSC_1.png)
+```powershell
+Configuration MyConfiguration {
+    ...
+}
+```
 
 Inside the configuration block you can define node configuration blocks that specify the desired configuration for a set of nodes (computers) in your environment that should be configured exactly the same. In this way, a node configuration represents a “role” for one or more nodes to assume. A node configuration block starts with the node keyword. Follow this keyword with the name of the role, which can be a variable or expression. After the role name, use braces {} to delimit the node configuration block.
 
-![alt text](./media/automation-dsc-overview/AADSC_2.png)
+```powershell
+Configuration MyConfiguration {
+
+    Node "webserver" {
+        ...
+    }
+
+}
+```
  
 Inside the node configuration block, you can define resource blocks to configure specific DSC resources. A resource block starts with the name of the resource, followed by the identifier you want to specify for that block, then braces {} to delimit the block.
 
-![alt text](./media/automation-dsc-overview/AADSC_3.png)
+```powershell
+Configuration MyConfiguration {
+
+    Node "webserver" {
+
+        WindowsFeature IIS {
+            Ensure="Present"
+            Name= "Web-Server"
+         }
+
+    }
+}
+```
 
 For more detailed information about the configuration keyword, see: [Understanding Configuration Keyword in Desired State Configuration](http://blogs.msdn.com/b/powershell/archive/2013/11/05/understanding-configuration-keyword-in-desired-state-configuration.aspx "Understanding Configuration Keyword in Desired State Configuration")
 
@@ -82,8 +107,19 @@ Azure Automation DSC ships with all the same built-in DSC resources as does PS D
 A compilation job in Azure Automation DSC is an instance of compilation of a configuration, to create one or more node configurations. They are similar to Azure Automation runbook jobs, except that they do not actually perform any task except to create node configurations. Any node configurations created by a compilation job are automatically placed on the Azure Automation DSC pull server, and overwrite previous versions of node configurations, if they existed for this configuration. The name of a node configuration produced by a compilation job takes the form of “ConfigurationName.NodeConfigurationBlockName”. For example, compiling the below configuration would produce a single node configuration called “MyConfiguration.webserver”
 
 
-![alt text](./media/automation-dsc-overview/AADSC_5.png)
+```powershell
+Configuration MyConfiguration {
 
+    Node "webserver" {
+
+        WindowsFeature IIS {
+            Ensure="Present"
+            Name= "Web-Server"
+         }
+
+    }
+}
+```
 
 >[AZURE.NOTE] Just like runbooks, configurations can be published. This is not related to putting DSC items onto the Azure Automation DSC pull server. Compilation jobs cause DSC items to be placed on the Azure Automation DSC pull server. For more information on “publishing” in Azure Automation, see [Publishing a Runbook](https://msdn.microsoft.com/library/dn903765.aspx).
 
